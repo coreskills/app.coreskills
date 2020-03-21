@@ -1,0 +1,225 @@
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
+    <div class="-ml-4 -mt-4 flex justify-between items-center flex-wrap sm:flex-no-wrap">
+      <div class="ml-4 mt-4">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Candidate Information
+        </h3>
+        <p class="mt-1 text-sm leading-5 text-gray-500">
+          Personal details and assignment status.
+        </p>
+      </div>
+      <div x-data="{ open: false }" @keydown.escape="open = false" @click.away="open = false"
+        class="relative inline-block text-left">
+        <div>
+          <button @click="open = !open"
+            class="flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+            </svg>
+          </button>
+        </div>
+        <div x-show="open" x-transition:enter="transition ease-out duration-100"
+          x-transition:enter-start="transform opacity-0 scale-95"
+          x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75"
+          x-transition:leave-start="transform opacity-100 scale-100"
+          x-transition:leave-end="transform opacity-0 scale-95"
+          class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg">
+          <div class="rounded-md bg-white shadow-xs">
+            <div class="py-1">
+              <a href="#"
+                class="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+                Update "Expires On"</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <dl>
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dd class="text-sm leading-5 font-medium text-gray-500">
+          Full name
+        </dd>
+        <dt class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {{candidate.fullName}}
+        </dt>
+      </div>
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dd class="text-sm leading-5 font-medium text-gray-500">
+          Email address
+        </dd>
+        <dt class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {{candidate.email}}
+        </dt>
+      </div>
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dd class="text-sm leading-5 font-medium text-gray-500">
+          Current Status
+        </dd>
+        <dt class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {{candidate.status}}
+        </dt>
+      </div>
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dd class="text-sm leading-5 font-medium text-gray-500">
+          Expires On
+        </dd>
+        <dt class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {{candidate.expiresOn}}
+        </dt>
+      </div>
+      {{#if candidate.repository}}
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dd class="text-sm leading-5 font-medium text-gray-500">
+          Repository
+        </dd>
+        <dt class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          <button type="button" onclick="openRepo()"
+            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-50 focus:outline-none focus:border-indigo-300 focus:shadow-outline-indigo active:bg-indigo-200 transition ease-in-out duration-150">
+            <svg class="-ml-0.5 mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M10 6H6C4.89543 6 4 6.89543 4 8V18C4 19.1046 4.89543 20 6 20H16C17.1046 20 18 19.1046 18 18V14M14 4H20M20 4V10M20 4L10 14"
+                stroke="#5045CD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Repository
+          </button>
+        </dt>
+      </div>
+      {{/if}}
+      {{#if candidate.pullRequest}}
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dd class="text-sm leading-5 font-medium text-gray-500">
+          Pull Request
+        </dd>
+        <dt class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          <button type="button" onclick="openPR()"
+            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-50 focus:outline-none focus:border-indigo-300 focus:shadow-outline-indigo active:bg-indigo-200 transition ease-in-out duration-150">
+            <svg class="-ml-0.5 mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M10 6H6C4.89543 6 4 6.89543 4 8V18C4 19.1046 4.89543 20 6 20H16C17.1046 20 18 19.1046 18 18V14M14 4H20M20 4V10M20 4L10 14"
+                stroke="#5045CD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Pull Request
+          </button>
+        </dt>
+      </div>
+      {{/if}}
+      {{#if candidate.totalScore}}
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dd class="text-sm leading-5 font-medium text-gray-500">
+          Total Score
+        </dd>
+        <dt class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {{#if (isGreen candidate.totalScore)}}
+          <span
+            class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium leading-5 bg-green-100 text-green-800">
+            {{candidate.totalScore}}
+          </span>
+          {{/if}}
+          {{#if (isYellow candidate.totalScore)}}
+          <span
+            class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium leading-5 bg-yellow-100 text-yellow-800">
+            {{candidate.totalScore}}
+          </span>
+          {{/if}}
+          {{#if (isOrange candidate.totalScore)}}
+          <span
+            class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium leading-5 bg-orange-100 text-orange-800">
+            {{candidate.totalScore}}
+          </span>
+          {{/if}}
+          {{#if (isRed candidate.totalScore)}}
+          <span
+            class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium leading-5 bg-red-100 text-red-800">
+            {{candidate.totalScore}}
+          </span>
+          {{/if}}
+        </dt>
+      </div>
+      {{/if}}
+    </dl>
+  </div>
+</div>
+<br />
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Candidate Scorecard
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
+      {{#if candidate.scorecard}}
+      Results breakdown.
+      {{else}}
+      Available when assignment is completed.
+      {{/if}}
+    </p>
+  </div>
+  <div class="flex flex-col">
+    <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
+        <table class="min-w-full">
+          <thead>
+            <tr>
+              <th
+                class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Task
+              </th>
+              <th
+                class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Result
+              </th>
+              <th
+                class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Skills
+              </th>
+              <th
+                class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                Comments
+              </th>
+              <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            {{#each candidate.scorecard}}
+            <tr>
+              <td
+                class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium text-gray-900">
+                {{task}}
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                {{#if (isPassed result)}}
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  Passed
+                </span>
+                {{else}}
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                  Failed
+                </span>
+                {{/if}}
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                {{skills}}
+              </td>
+              <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
+                {{comments}}
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openRepo() {
+    window.open("{{candidate.repository}}", '_blank');
+  }
+  function openPR() {
+    window.open("{{candidate.pullRequest}}", '_blank');
+  }
+</script>

@@ -1,0 +1,11 @@
+node_modules/
+views/build
+public/
+
+.firebaserc
+.firebase/
+serviceAccountKey.json
+
+.gcloudignore
+
+.vscode/
