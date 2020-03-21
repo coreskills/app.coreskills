@@ -170,6 +170,32 @@ app.get('/candidate/:email', function (req, res) {
             res.render('login', {title: "Login"});
         });
 });
+app.get('/challenge-breakdown/:email/:task', function (req, res) {
+    const sessionCookie = req.cookies.session || '';
+    admin.auth().verifySessionCookie(
+        sessionCookie, true /** checkRevoked */)
+        .then(async (decodedClaims) => {
+            const userRef = db.collection("users").doc(decodedClaims.user_id);
+            const user = await userRef.get();
+            const organizationRef = user.data().organization;
+            const organization = await organizationRef.get();
+            const roleName = organization.data().role;
+            const candidatesQuerySnapshot = await organizationRef.collection('candidates').where("email", "==", req.params.email).get();
+            const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
+
+            res.render('candidate', {
+                title: 'Candidate Information',
+                role: roleName,
+                candidate: candidateList[0],
+                displayName: user.data().displayName,
+                avatar: user.data().avatar,
+                email: user.data().email,
+            });
+        })
+        .catch(error => {
+            res.render('login', {title: "Login"});
+        });
+});
 
 app.get("/new-candidate", (req, res) => {
     const sessionCookie = req.cookies.session || '';
