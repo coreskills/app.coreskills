@@ -6,7 +6,8 @@
   "scripts": {
     "build": "postcss css/tailwind.css -o public/tailwind.css && npm install",
     "dev": "node --inspect-brk index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "admin": "./admin.js"
   },
   "keywords": [],
   "author": "",

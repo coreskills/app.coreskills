@@ -17,6 +17,15 @@ let db = admin.firestore();
 
 var app = express();
 
+const demoEmails = new Set([
+    'DanaSShaw@armyspy.com',
+    'PatrickBDodd@jourrapide.com',
+    'CharlesJDegennaro@rhyta.com',
+    'LindsayNGrimmett@rhyta.com',
+    'TeresaJThomas@rhyta.com',
+    'MarthaRMcCartney@jourrapide.com',
+]);
+
 var hbs = exphbs.create({
     // Specify helpers which are only registered on this instance.
     helpers: {
@@ -68,7 +77,7 @@ app.get('/', (req, res) => {
             const candidatesQuerySnapshot = await organizationRef.collection('candidates').get();
             const candidateList = candidatesQuerySnapshot.docs
                 .map(snapshot => snapshot.data())
-                .sort(function(a, b){return Date.parse(b.expiresOn) - Date.parse(a.expiresOn)})
+                .sort(function (a, b) { return Date.parse(b.expiresOn) - Date.parse(a.expiresOn) })
 
             res.render('candidates', {
                 title: 'Candidate Dashboard',
@@ -80,8 +89,26 @@ app.get('/', (req, res) => {
             });
         })
         .catch(error => {
-            res.render('login', {title: "Login"});
+            res.render('login', { title: "Login" });
         });
+});
+
+app.get('/demo', async (req, res) => {
+    let organization = admin.firestore().collection('organizations').doc('ghxJKxmhi7c5CxpBGVBx');
+    const roleName = (await organization.get()).data().role;
+    const candidatesQuerySnapshot = await organization.collection('candidates').get();
+    const candidateList = candidatesQuerySnapshot.docs
+        .map(snapshot => snapshot.data())
+        .sort(function (a, b) { return Date.parse(b.expiresOn) - Date.parse(a.expiresOn) })
+
+    res.render('candidates', {
+        title: 'Candidate Dashboard',
+        displayName: "Frances J. Ruel",
+        avatar: "https://secure.gravatar.com/avatar/ae3d5387e16c55b28ea5d3e6bcf8c70b?s=80&d=identicon",
+        email: "FrancesJRuel@dayrep.com",
+        candidates: candidateList,
+        role: roleName
+    });
 });
 
 app.post('/sessionLogin', async (req, res) => {
@@ -122,8 +149,8 @@ app.post('/sendAssignment', async (req, res) => {
     admin.firestore().collection('mail').add({
         to: 'anton@coreskills.dev',
         message: {
-          subject: '✅ Coreskills: New Candidate',
-          html: `
+            subject: '✅ Coreskills: New Candidate',
+            html: `
             <ul>
               <li>Company: ${company}</li>
               <li>Role: ${role}</li>
@@ -144,31 +171,47 @@ app.post('/sendAssignment', async (req, res) => {
     res.end(JSON.stringify({ status: 'success' }));
 });
 
-app.get('/candidate/:email', function (req, res) {
-    const sessionCookie = req.cookies.session || '';
-    admin.auth().verifySessionCookie(
-        sessionCookie, true /** checkRevoked */)
-        .then(async (decodedClaims) => {
-            const userRef = db.collection("users").doc(decodedClaims.user_id);
-            const user = await userRef.get();
-            const organizationRef = user.data().organization;
-            const organization = await organizationRef.get();
-            const roleName = organization.data().role;
-            const candidatesQuerySnapshot = await organizationRef.collection('candidates').where("email", "==", req.params.email).get();
-            const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
+app.get('/candidate/:email', async function (req, res) {
+    if (demoEmails.has(req.params.email)) {
+        const organization = admin.firestore().collection('organizations').doc('ghxJKxmhi7c5CxpBGVBx');
+        const roleName = (await organization.get()).data().role;
+        const candidatesQuerySnapshot = await organization.collection('candidates').where("email", "==", req.params.email).get();
+        const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
 
-            res.render('candidate', {
-                title: 'Candidate Information',
-                role: roleName,
-                candidate: candidateList[0],
-                displayName: user.data().displayName,
-                avatar: user.data().avatar,
-                email: user.data().email,
-            });
-        })
-        .catch(error => {
-            res.render('login', {title: "Login"});
+        res.render('candidate', {
+            title: 'Candidate Information',
+            role: roleName,
+            candidate: candidateList[0],
+            displayName: "Frances J. Ruel",
+            avatar: "https://secure.gravatar.com/avatar/ae3d5387e16c55b28ea5d3e6bcf8c70b?s=80&d=identicon",
+            email: "FrancesJRuel@dayrep.com",
         });
+    } else {
+        const sessionCookie = req.cookies.session || '';
+        admin.auth().verifySessionCookie(
+            sessionCookie, true /** checkRevoked */)
+            .then(async (decodedClaims) => {
+                const userRef = db.collection("users").doc(decodedClaims.user_id);
+                const user = await userRef.get();
+                const organizationRef = user.data().organization;
+                const organization = await organizationRef.get();
+                const roleName = organization.data().role;
+                const candidatesQuerySnapshot = await organizationRef.collection('candidates').where("email", "==", req.params.email).get();
+                const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
+
+                res.render('candidate', {
+                    title: 'Candidate Information',
+                    role: roleName,
+                    candidate: candidateList[0],
+                    displayName: user.data().displayName,
+                    avatar: user.data().avatar,
+                    email: user.data().email,
+                });
+            })
+            .catch(error => {
+                res.render('login', { title: "Login" });
+            });
+    }
 });
 app.get('/challenge-breakdown/:email/:task', function (req, res) {
     const sessionCookie = req.cookies.session || '';
@@ -193,7 +236,7 @@ app.get('/challenge-breakdown/:email/:task', function (req, res) {
             });
         })
         .catch(error => {
-            res.render('login', {title: "Login"});
+            res.render('login', { title: "Login" });
         });
 });
 
@@ -220,14 +263,14 @@ app.get("/new-candidate", (req, res) => {
             });
         })
         .catch(error => {
-            res.render('login', {title: "Login"});
+            res.render('login', { title: "Login" });
         });
 });
 
 app.get('/sessionLogout', (req, res) => {
     res.clearCookie('session');
-    res.render('login', {title: "Login"});
-  });
+    res.render('login', { title: "Login" });
+});
 
 app.listen(8080);
 
