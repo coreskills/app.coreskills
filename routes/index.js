@@ -1,0 +1,1 @@
+const { app, auth, firestore } = require('../server');

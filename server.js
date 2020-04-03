@@ -1,10 +1,10 @@
 const express = require('express');
+const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const md5 = require('js-md5');
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccountKey.json');
-const app = express();
 const demoEmails = new Set([
   'DanaSShaw@armyspy.com',
   'PatrickBDodd@jourrapide.com',
@@ -43,7 +43,8 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://coreskills-d99ea.firebaseio.com"
 });
-const db = admin.firestore();
+const firestore = admin.firestore();
+const auth = admin.auth();
 
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
@@ -65,32 +66,32 @@ function attachCsrfToken(url, cookie, value) {
   }
 
 app.get('/', (req, res) => {
-    const sessionCookie = req.cookies.session || '';
-    admin.auth().verifySessionCookie(
-        sessionCookie, true /** checkRevoked */)
-        .then(async (decodedClaims) => {
-            const userRef = db.collection("users").doc(decodedClaims.user_id);
-            const user = await userRef.get();
-            const organizationRef = user.data().organization;
-            const organization = await organizationRef.get();
-            const roleName = organization.data().role;
-            const candidatesQuerySnapshot = await organizationRef.collection('candidates').get();
-            const candidateList = candidatesQuerySnapshot.docs
-                .map(snapshot => snapshot.data())
-                .sort(function (a, b) { return Date.parse(b.expiresOn) - Date.parse(a.expiresOn) })
+  const sessionCookie = req.cookies.session || '';
+  auth.verifySessionCookie(
+    sessionCookie, true)
+    .then(async (decodedClaims) => {
+      const userRef = firestore.collection("users").doc(decodedClaims.user_id);
+      const user = await userRef.get();
+      const organizationRef = user.data().organization;
+      const organization = await organizationRef.get();
+      const roleName = organization.data().role;
+      const candidatesQuerySnapshot = await organizationRef.collection('candidates').get();
+      const candidateList = candidatesQuerySnapshot.docs
+        .map(snapshot => snapshot.data())
+        .sort(function (a, b) { return Date.parse(b.expiresOn) - Date.parse(a.expiresOn) })
 
-            res.render('candidates', {
-                title: 'Candidate Dashboard',
-                displayName: user.data().displayName,
-                avatar: user.data().avatar,
-                email: user.data().email,
-                candidates: candidateList,
-                role: roleName
-            });
-        })
-        .catch(error => {
-            res.render('login', { title: "Login" });
-        });
+      res.render('candidates', {
+        title: 'Candidate Dashboard',
+        displayName: user.data().displayName,
+        avatar: user.data().avatar,
+        email: user.data().email,
+        candidates: candidateList,
+        role: roleName
+      });
+    })
+    .catch(error => {
+      res.render('login', { title: "Login" });
+    });
 });
 
 app.get('/demo', async (req, res) => {
@@ -121,7 +122,7 @@ app.post('/sessionLogin', async (req, res) => {
     }
 
     const expiresIn = 60 * 60 * 24 * 5 * 1000;
-    admin.auth().createSessionCookie(idToken, { expiresIn })
+    auth.createSessionCookie(idToken, { expiresIn })
         .then((sessionCookie) => {
             // Set cookie policy for session cookie.
             const options = { maxAge: expiresIn, httpOnly: true, secure: false };
@@ -161,7 +162,7 @@ app.post('/sendAssignment', async (req, res) => {
         },
     });
     let md5Email = md5(emailAddress);
-    db.collection('organizations').doc(organizationId).collection('candidates').add({
+    firestore.collection('organizations').doc(organizationId).collection('candidates').add({
         avatar: `https://www.gravatar.com/avatar/${md5Email}?s=128&d=identicon&r=PG`,
         email: emailAddress,
         fullName: fullName,
@@ -188,10 +189,10 @@ app.get('/candidate/:email', async function (req, res) {
         });
     } else {
         const sessionCookie = req.cookies.session || '';
-        admin.auth().verifySessionCookie(
+        auth.verifySessionCookie(
             sessionCookie, true /** checkRevoked */)
             .then(async (decodedClaims) => {
-                const userRef = db.collection("users").doc(decodedClaims.user_id);
+                const userRef = firestore.collection("users").doc(decodedClaims.user_id);
                 const user = await userRef.get();
                 const organizationRef = user.data().organization;
                 const organization = await organizationRef.get();
@@ -215,10 +216,10 @@ app.get('/candidate/:email', async function (req, res) {
 });
 app.get('/challenge-breakdown/:email/:task', function (req, res) {
     const sessionCookie = req.cookies.session || '';
-    admin.auth().verifySessionCookie(
+    auth.verifySessionCookie(
         sessionCookie, true /** checkRevoked */)
         .then(async (decodedClaims) => {
-            const userRef = db.collection("users").doc(decodedClaims.user_id);
+            const userRef = firestore.collection("users").doc(decodedClaims.user_id);
             const user = await userRef.get();
             const organizationRef = user.data().organization;
             const organization = await organizationRef.get();
@@ -242,10 +243,10 @@ app.get('/challenge-breakdown/:email/:task', function (req, res) {
 
 app.get("/new-candidate", (req, res) => {
     const sessionCookie = req.cookies.session || '';
-    admin.auth().verifySessionCookie(
+    auth.verifySessionCookie(
         sessionCookie, true /** checkRevoked */)
         .then(async (decodedClaims) => {
-            const userRef = db.collection("users").doc(decodedClaims.user_id);
+            const userRef = firestore.collection("users").doc(decodedClaims.user_id);
             const user = await userRef.get();
             const organizationRef = user.data().organization;
             const organization = await organizationRef.get();
@@ -271,3 +272,7 @@ app.get('/sessionLogout', (req, res) => {
     res.clearCookie('session');
     res.render('login', { title: "Login" });
 });
+
+module.exports.app = app;
+module.exports.auth = auth;
+module.exports.firestore = firestore;
