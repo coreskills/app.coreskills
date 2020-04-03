@@ -2,10 +2,10 @@
   "name": "app-coreskills-alpine",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "app/server.js",
   "scripts": {
     "build": "postcss css/tailwind.css -o public/tailwind.css && npm install",
-    "start": "node server.js",
+    "start": "GOOGLE_APPLICATION_CREDENTIALS=serviceAccountKey.json node app/server.js",
     "admin": "./admin.js"
   },
   "keywords": [],
