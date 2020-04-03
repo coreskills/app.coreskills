@@ -1,68 +1,68 @@
-var express = require('express');
-var exphbs = require('express-handlebars');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var md5 = require('js-md5');
-
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const md5 = require('js-md5');
 const admin = require('firebase-admin');
-
 const serviceAccount = require('./serviceAccountKey.json');
-
+const app = express();
+const demoEmails = new Set([
+  'DanaSShaw@armyspy.com',
+  'PatrickBDodd@jourrapide.com',
+  'CharlesJDegennaro@rhyta.com',
+  'LindsayNGrimmett@rhyta.com',
+  'TeresaJThomas@rhyta.com',
+  'MarthaRMcCartney@jourrapide.com',
+]);
+const exphbs = require('express-handlebars');
+const hbs = exphbs.create({
+  helpers: {
+    isCompleted: (status) => {
+      return status === "Assignment Completed";
+    },
+    isDroppedOut: (status) => {
+      return status === "Dropped out";
+    },
+    isPassed: (result) => {
+      return result === "passed";
+    },
+    isGreen: (score) => {
+      return score >= 80;
+    },
+    isYellow: (score) => {
+      return score >= 60 && score < 80;
+    },
+    isOrange: (score) => {
+      return score >= 40 && score < 60;
+    },
+    isRed: (score) => {
+      return score < 40;
+    }
+  }
+});
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://coreskills-d99ea.firebaseio.com"
 });
+const db = admin.firestore();
 
-let db = admin.firestore();
-
-var app = express();
-
-const demoEmails = new Set([
-    'DanaSShaw@armyspy.com',
-    'PatrickBDodd@jourrapide.com',
-    'CharlesJDegennaro@rhyta.com',
-    'LindsayNGrimmett@rhyta.com',
-    'TeresaJThomas@rhyta.com',
-    'MarthaRMcCartney@jourrapide.com',
-]);
-
-var hbs = exphbs.create({
-    // Specify helpers which are only registered on this instance.
-    helpers: {
-        isCompleted: (status) => {
-            return status === "Assignment Completed";
-        },
-        isDroppedOut: (status) => {
-            return status === "Dropped out";
-        },
-        isPassed: (result) => {
-            return result === "passed";
-        },
-        isGreen: (score) => {
-            return score >= 80;
-        },
-        isYellow: (score) => {
-            return score >= 60 && score < 80;
-        },
-        isOrange: (score) => {
-            return score >= 40 && score < 60;
-        },
-        isRed: (score) => {
-            return score < 40;
-        }
-    }
-});
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
-
-app.use('/static', express.static('public'))
-app.use(cookieParser())
+app.use('/static', express.static('public'));
+app.use(cookieParser());
 app.use(attachCsrfToken('/', 'csrfToken', (Math.random() * 100000000000000000).toString()));
 app.use(bodyParser.json());
-// Support URL-encoded bodies.
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+app.listen(8080);
+
+function attachCsrfToken(url, cookie, value) {
+    return (req, res, next) => {
+      if (req.url === url) res.cookie(cookie, value);
+      next();
+    }
+  }
 
 app.get('/', (req, res) => {
     const sessionCookie = req.cookies.session || '';
@@ -271,14 +271,3 @@ app.get('/sessionLogout', (req, res) => {
     res.clearCookie('session');
     res.render('login', { title: "Login" });
 });
-
-app.listen(8080);
-
-function attachCsrfToken(url, cookie, value) {
-    return function (req, res, next) {
-        if (req.url == url) {
-            res.cookie(cookie, value);
-        }
-        next();
-    }
-}
