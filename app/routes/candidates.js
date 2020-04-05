@@ -1,12 +1,8 @@
-const express = require('express');
-const router = express.Router();
-
-const admin = require('firebase-admin');
-const firestore = admin.firestore();
-const auth = admin.auth();
-
+// Imports
+const router = require('express').Router();
 const md5 = require('js-md5');
-
+const firestore = require('firebase-admin').firestore();
+const login = require('../actions/auth');
 const demoEmails = new Set([
   'DanaSShaw@armyspy.com',
   'PatrickBDodd@jourrapide.com',
@@ -16,13 +12,14 @@ const demoEmails = new Set([
   'MarthaRMcCartney@jourrapide.com',
 ]);
 
+// Routes
 router.post('/sendAssignment', async (req, res) => {
   const organizationId = req.body.organizationId.toString();
   const company = req.body.company.toString();
   const role = req.body.role.toString();
   const fullName = req.body.fullName.toString();
   const emailAddress = req.body.emailAddress.toString();
-  admin.firestore().collection('mail').add({
+  firestore.collection('mail').add({
     to: 'anton@coreskills.dev',
     message: {
       subject: '✅ Coreskills: New Candidate',
@@ -49,23 +46,9 @@ router.post('/sendAssignment', async (req, res) => {
 
 router.get('/candidate/:email', async function (req, res) {
   if (demoEmails.has(req.params.email)) {
-    const organization = admin.firestore().collection('organizations').doc('ghxJKxmhi7c5CxpBGVBx');
-    const roleName = (await organization.get()).data().role;
-    const candidatesQuerySnapshot = await organization.collection('candidates').where("email", "==", req.params.email).get();
-    const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
-
-    res.render('candidate', {
-      title: 'Candidate Information',
-      role: roleName,
-      candidate: candidateList[0],
-      displayName: "Frances J. Ruel",
-      avatar: "https://secure.gravatar.com/avatar/ae3d5387e16c55b28ea5d3e6bcf8c70b?s=80&d=identicon",
-      email: "FrancesJRuel@dayrep.com",
-    });
+    await renderDemoProfile(req, res);
   } else {
-    const sessionCookie = req.cookies.session || '';
-    auth.verifySessionCookie(
-      sessionCookie, true /** checkRevoked */)
+    login(req)
       .then(async (decodedClaims) => {
         const userRef = firestore.collection("users").doc(decodedClaims.user_id);
         const user = await userRef.get();
@@ -89,37 +72,9 @@ router.get('/candidate/:email', async function (req, res) {
       });
   }
 });
-router.get('/challenge-breakdown/:email/:task', function (req, res) {
-  const sessionCookie = req.cookies.session || '';
-  auth.verifySessionCookie(
-    sessionCookie, true /** checkRevoked */)
-    .then(async (decodedClaims) => {
-      const userRef = firestore.collection("users").doc(decodedClaims.user_id);
-      const user = await userRef.get();
-      const organizationRef = user.data().organization;
-      const organization = await organizationRef.get();
-      const roleName = organization.data().role;
-      const candidatesQuerySnapshot = await organizationRef.collection('candidates').where("email", "==", req.params.email).get();
-      const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
-
-      res.render('candidate', {
-        title: 'Candidate Information',
-        role: roleName,
-        candidate: candidateList[0],
-        displayName: user.data().displayName,
-        avatar: user.data().avatar,
-        email: user.data().email,
-      });
-    })
-    .catch(() => {
-      res.render('login', { title: "Login" });
-    });
-});
 
 router.get("/new-candidate", (req, res) => {
-  const sessionCookie = req.cookies.session || '';
-  auth.verifySessionCookie(
-    sessionCookie, true /** checkRevoked */)
+  login(req)
     .then(async (decodedClaims) => {
       const userRef = firestore.collection("users").doc(decodedClaims.user_id);
       const user = await userRef.get();
@@ -143,4 +98,22 @@ router.get("/new-candidate", (req, res) => {
     });
 });
 
+// Utils
+async function renderDemoProfile(req, res) {
+  const organization = firestore.collection('organizations').doc('ghxJKxmhi7c5CxpBGVBx');
+  const roleName = (await organization.get()).data().role;
+  const candidatesQuerySnapshot = await organization.collection('candidates').where("email", "==", req.params.email).get();
+  const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
+
+  res.render('candidate', {
+    title: 'Candidate Information',
+    role: roleName,
+    candidate: candidateList[0],
+    displayName: "Frances J. Ruel",
+    avatar: "https://secure.gravatar.com/avatar/ae3d5387e16c55b28ea5d3e6bcf8c70b?s=80&d=identicon",
+    email: "FrancesJRuel@dayrep.com",
+  });
+}
+
+// Exports
 module.exports = router;

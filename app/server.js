@@ -1,3 +1,5 @@
+// Imports
+
 // ExpressJS
 const express = require('express');
 const app = express();
@@ -50,7 +52,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-// Routes setup
+// Routes
 const indexRouter = require('./routes/index');
 const demoRouter = require('./routes/demo');
 const authRouter = require('./routes/auth');
@@ -71,5 +73,5 @@ function attachCsrfToken(url, cookie, value) {
   }
 }
 
-// Module exports
+// Exports
 module.exports = app;
