@@ -18,33 +18,13 @@ const ORGANIZATIONS_COLLECTION = 'organizations';
 const CANDIDATES_COLLECTION = 'candidates';
 const USERS_COLLECTION = 'users';
 
-// Routes
+// Commands
 router.post('/sendAssignment', async (req, res) => {
   login(req)
     .then(async (decodedClaims) => {
-      const { organizationId, company, role, fullName, emailAddress, } = req.body;
-      firestore.collection(MAIL_COLLECTION).add({
-        to: 'anton@coreskills.dev',
-        message: {
-          subject: '✅ Coreskills: New Candidate',
-          html: `
-            <ul>
-              <li>Company: ${company}</li>
-              <li>Role: ${role}</li>
-              <li>Full Name: ${fullName}</li>
-              <li>Email: ${emailAddress}</li>
-            </ul>
-          `,
-        },
-      });
-      let md5Email = md5(emailAddress);
-      firestore.collection(ORGANIZATIONS_COLLECTION).doc(organizationId).collection(CANDIDATES_COLLECTION).add({
-        avatar: `https://www.gravatar.com/avatar/${md5Email}?s=128&d=identicon&r=PG`,
-        email: emailAddress,
-        fullName: fullName,
-        expiresOn: '(pending)',
-        status: "Sending assignment"
-      });
+      const { organizationId, company, role, fullName, emailAddress } = req.body;
+      sendEmail(company, role, fullName, emailAddress);
+      addCandidate(organizationId, emailAddress, fullName);
       res.end(JSON.stringify({ status: 'success' }));
     })
     .catch(() => {
@@ -52,6 +32,7 @@ router.post('/sendAssignment', async (req, res) => {
     });
 });
 
+// Routes
 router.get('/candidate/:email', async function (req, res) {
   if (demoEmails.has(req.params.email)) {
     await renderDemoProfile(req, res);
@@ -120,6 +101,34 @@ async function renderDemoProfile(req, res) {
     displayName: "Frances J. Ruel",
     avatar: "https://secure.gravatar.com/avatar/ae3d5387e16c55b28ea5d3e6bcf8c70b?s=80&d=identicon",
     email: "FrancesJRuel@dayrep.com",
+  });
+}
+
+function sendEmail(company, role, fullName, emailAddress) {
+  firestore.collection(MAIL_COLLECTION).add({
+    to: 'anton@coreskills.dev',
+    message: {
+      subject: '✅ CoreSkills App: New Candidate',
+      html: `
+            <ul>
+              <li>Company: ${company}</li>
+              <li>Role: ${role}</li>
+              <li>Full Name: ${fullName}</li>
+              <li>Email: ${emailAddress}</li>
+            </ul>
+          `,
+    },
+  });
+}
+
+function addCandidate(organizationId, emailAddress, fullName) {
+  let md5Email = md5(emailAddress);
+  firestore.collection(ORGANIZATIONS_COLLECTION).doc(organizationId).collection(CANDIDATES_COLLECTION).add({
+    avatar: `https://www.gravatar.com/avatar/${md5Email}?s=128&d=identicon&r=PG`,
+    email: emailAddress,
+    fullName: fullName,
+    expiresOn: '(pending)',
+    status: "Sending assignment"
   });
 }
 
