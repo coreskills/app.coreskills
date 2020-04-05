@@ -12,16 +12,18 @@ const demoEmails = new Set([
   'MarthaRMcCartney@jourrapide.com',
 ]);
 
+// Firestore
+const MAIL_COLLECTION = 'mail';
+const ORGANIZATIONS_COLLECTION = 'organizations';
+const CANDIDATES_COLLECTION = 'candidates';
+const USERS_COLLECTION = 'users';
+
 // Routes
 router.post('/sendAssignment', async (req, res) => {
   login(req)
     .then(async (decodedClaims) => {
-      const organizationId = req.body.organizationId.toString();
-      const company = req.body.company.toString();
-      const role = req.body.role.toString();
-      const fullName = req.body.fullName.toString();
-      const emailAddress = req.body.emailAddress.toString();
-      firestore.collection('mail').add({
+      const { organizationId, company, role, fullName, emailAddress, } = req.body;
+      firestore.collection(MAIL_COLLECTION).add({
         to: 'anton@coreskills.dev',
         message: {
           subject: '✅ Coreskills: New Candidate',
@@ -36,7 +38,7 @@ router.post('/sendAssignment', async (req, res) => {
         },
       });
       let md5Email = md5(emailAddress);
-      firestore.collection('organizations').doc(organizationId).collection('candidates').add({
+      firestore.collection(ORGANIZATIONS_COLLECTION).doc(organizationId).collection(CANDIDATES_COLLECTION).add({
         avatar: `https://www.gravatar.com/avatar/${md5Email}?s=128&d=identicon&r=PG`,
         email: emailAddress,
         fullName: fullName,
@@ -56,12 +58,12 @@ router.get('/candidate/:email', async function (req, res) {
   } else {
     login(req)
       .then(async (decodedClaims) => {
-        const userRef = firestore.collection("users").doc(decodedClaims.user_id);
+        const userRef = firestore.collection(USERS_COLLECTION).doc(decodedClaims.user_id);
         const user = await userRef.get();
         const organizationRef = user.data().organization;
         const organization = await organizationRef.get();
         const roleName = organization.data().role;
-        const candidatesQuerySnapshot = await organizationRef.collection('candidates').where("email", "==", req.params.email).get();
+        const candidatesQuerySnapshot = await organizationRef.collection(CANDIDATES_COLLECTION).where("email", "==", req.params.email).get();
         const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
 
         res.render('candidate', {
@@ -82,7 +84,7 @@ router.get('/candidate/:email', async function (req, res) {
 router.get("/new-candidate", (req, res) => {
   login(req)
     .then(async (decodedClaims) => {
-      const userRef = firestore.collection("users").doc(decodedClaims.user_id);
+      const userRef = firestore.collection(USERS_COLLECTION).doc(decodedClaims.user_id);
       const user = await userRef.get();
       const organizationRef = user.data().organization;
       const organization = await organizationRef.get();
@@ -106,9 +108,9 @@ router.get("/new-candidate", (req, res) => {
 
 // Utils
 async function renderDemoProfile(req, res) {
-  const organization = firestore.collection('organizations').doc('ghxJKxmhi7c5CxpBGVBx');
+  const organization = firestore.collection(ORGANIZATIONS_COLLECTION).doc('ghxJKxmhi7c5CxpBGVBx');
   const roleName = (await organization.get()).data().role;
-  const candidatesQuerySnapshot = await organization.collection('candidates').where("email", "==", req.params.email).get();
+  const candidatesQuerySnapshot = await organization.collection(CANDIDATES_COLLECTION).where("email", "==", req.params.email).get();
   const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
 
   res.render('candidate', {
