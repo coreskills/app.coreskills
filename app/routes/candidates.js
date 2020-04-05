@@ -14,16 +14,18 @@ const demoEmails = new Set([
 
 // Routes
 router.post('/sendAssignment', async (req, res) => {
-  const organizationId = req.body.organizationId.toString();
-  const company = req.body.company.toString();
-  const role = req.body.role.toString();
-  const fullName = req.body.fullName.toString();
-  const emailAddress = req.body.emailAddress.toString();
-  firestore.collection('mail').add({
-    to: 'anton@coreskills.dev',
-    message: {
-      subject: '✅ Coreskills: New Candidate',
-      html: `
+  login(req)
+    .then(async (decodedClaims) => {
+      const organizationId = req.body.organizationId.toString();
+      const company = req.body.company.toString();
+      const role = req.body.role.toString();
+      const fullName = req.body.fullName.toString();
+      const emailAddress = req.body.emailAddress.toString();
+      firestore.collection('mail').add({
+        to: 'anton@coreskills.dev',
+        message: {
+          subject: '✅ Coreskills: New Candidate',
+          html: `
             <ul>
               <li>Company: ${company}</li>
               <li>Role: ${role}</li>
@@ -31,17 +33,21 @@ router.post('/sendAssignment', async (req, res) => {
               <li>Email: ${emailAddress}</li>
             </ul>
           `,
-    },
-  });
-  let md5Email = md5(emailAddress);
-  firestore.collection('organizations').doc(organizationId).collection('candidates').add({
-    avatar: `https://www.gravatar.com/avatar/${md5Email}?s=128&d=identicon&r=PG`,
-    email: emailAddress,
-    fullName: fullName,
-    expiresOn: '(pending)',
-    status: "Sending assignment"
-  });
-  res.end(JSON.stringify({ status: 'success' }));
+        },
+      });
+      let md5Email = md5(emailAddress);
+      firestore.collection('organizations').doc(organizationId).collection('candidates').add({
+        avatar: `https://www.gravatar.com/avatar/${md5Email}?s=128&d=identicon&r=PG`,
+        email: emailAddress,
+        fullName: fullName,
+        expiresOn: '(pending)',
+        status: "Sending assignment"
+      });
+      res.end(JSON.stringify({ status: 'success' }));
+    })
+    .catch(() => {
+      res.status(401).end('Unauthorized');
+    });
 });
 
 router.get('/candidate/:email', async function (req, res) {
