@@ -134,3 +134,7 @@ function addCandidate(organizationId, emailAddress, fullName) {
 
 // Exports
 module.exports = router;
+
+// TODO
+// - encapsulate rendering most used pages with data
+// - simplify firestore data access with utility methods
