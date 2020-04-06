@@ -38,14 +38,13 @@ router.post('/createScorecard', async (req, res) => {
       const organizationRef = user.data().organization;
 
       const candidateEmail = req.body.candidateEmail.toString();
-      const scorecard = req.body.scorecardData.toString();
 
       const candidatesQuerySnapshot = await organizationRef.collection('candidates').where("email", "==", candidateEmail).get();
       const candidateRef = candidatesQuerySnapshot.docs[0];
 
       firestore.doc(`organizations/${organizationRef.id}/candidates/${candidateRef.id}`)
         .update({
-          scorecard: scorecard
+          scorecard: req.body.scorecardData
         });
 
       res.end(JSON.stringify({ status: 'success' }));
@@ -59,3 +58,7 @@ router.post('/createScorecard', async (req, res) => {
 
 // Exports
 module.exports = router;
+
+// TODO
+// Convert result true/false to passed/failed
+// Convert skills from string to array
