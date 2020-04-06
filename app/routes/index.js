@@ -3,12 +3,12 @@ const router = express.Router();
 
 const admin = require('firebase-admin');
 const firestore = admin.firestore();
+const login = require('../actions/auth');
 const auth = admin.auth();
 
 router.get('/', (req, res) => {
   const sessionCookie = req.cookies.session || '';
-  auth.verifySessionCookie(
-    sessionCookie, true)
+  login(req)
     .then(async (decodedClaims) => {
       const userRef = firestore.collection("users").doc(decodedClaims.user_id);
       const user = await userRef.get();
