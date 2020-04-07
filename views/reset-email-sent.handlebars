@@ -14,7 +14,7 @@
   function resetPassword(event) {
     let email = document.getElementById("email").value;
     let actionCodeSettings = {
-      url: 'http://localhost:8080/,
+      url: 'https://app.coreskills.dev/'
     };
     auth.sendPasswordResetEmail(emailAddress, actionCodeSettings).then(function () {
       window.location.assign('/reset-email-sent');
