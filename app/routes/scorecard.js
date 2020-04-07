@@ -74,7 +74,3 @@ router.post('/createScorecard', async (req, res) => {
 
 // Exports
 module.exports = router;
-
-// TODO
-// Convert result true/false to passed/failed
-// Convert skills from string to array
