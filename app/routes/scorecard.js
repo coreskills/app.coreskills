@@ -42,10 +42,21 @@ router.post('/createScorecard', async (req, res) => {
       const candidatesQuerySnapshot = await organizationRef.collection('candidates').where("email", "==", candidateEmail).get();
       const candidateRef = candidatesQuerySnapshot.docs[0];
 
+      const scorecardData = req.body.scorecardData;
+
+      scorecardData.map(function(req) {
+        if (req.result === 'true') {
+          req.result = 'passed';
+        } else {
+          req.result = 'failed';
+        }
+
+        req.skills = req.skills.split(',');
+        return req;
+      });
+
       firestore.doc(`organizations/${organizationRef.id}/candidates/${candidateRef.id}`)
-        .update({
-          scorecard: req.body.scorecardData
-        });
+        .update({scorecard: scorecardData});
 
       res.end(JSON.stringify({ status: 'success' }));
     })
