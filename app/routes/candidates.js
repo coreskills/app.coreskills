@@ -54,6 +54,7 @@ router.get('/candidate/:email', async function (req, res) {
           displayName: user.data().displayName,
           avatar: user.data().avatar,
           email: user.data().email,
+          isInterviewer: user.data().role === 'interviewer',
         });
       })
       .catch(() => {

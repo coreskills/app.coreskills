@@ -7,23 +7,28 @@ router.get('/new-scorecard/:candidateEmail', async (req, res) => {
     .then(async (decodedClaims) => {
       const userRef = firestore.collection("users").doc(decodedClaims.user_id);
       const user = await userRef.get();
-      const organizationRef = user.data().organization;
-      const organization = await organizationRef.get();
-      const companyName = organization.data().name;
-      const roleName = organization.data().role;
-      const scorecard = organization.data().scorecard;
 
-      res.render('new-scorecard', {
-        title: "New Scorecard",
-        organizationId: organizationRef.id,
-        company: companyName,
-        role: roleName,
-        displayName: user.data().displayName,
-        avatar: user.data().avatar,
-        email: user.data().email,
-        scorecard: scorecard,
-        candidateEmail: req.params.candidateEmail,
-      });
+      if (user.data().role === 'interviewer') {
+        const organizationRef = user.data().organization;
+        const organization = await organizationRef.get();
+        const companyName = organization.data().name;
+        const roleName = organization.data().role;
+        const scorecard = organization.data().scorecard;
+
+        res.render('new-scorecard', {
+          title: "New Scorecard",
+          organizationId: organizationRef.id,
+          company: companyName,
+          role: roleName,
+          displayName: user.data().displayName,
+          avatar: user.data().avatar,
+          email: user.data().email,
+          scorecard: scorecard,
+          candidateEmail: req.params.candidateEmail,
+        });
+      } else {
+        res.status(401).end('Unauthorized');
+      }
     })
     .catch(error => {
       res.render('login', { title: "Login" });
