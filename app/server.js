@@ -55,11 +55,13 @@ const indexRouter = require('./routes/index');
 const demoRouter = require('./routes/demo');
 const authRouter = require('./routes/auth');
 const candidatesRouter = require('./routes/candidates');
+const scorecardRouter = require('./routes/scorecard');
 
 app.use(indexRouter);
 app.use(demoRouter);
 app.use(authRouter);
 app.use(candidatesRouter);
+app.use(scorecardRouter);
 
 app.listen(8080);
 

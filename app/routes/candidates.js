@@ -54,6 +54,7 @@ router.get('/candidate/:email', async function (req, res) {
           displayName: user.data().displayName,
           avatar: user.data().avatar,
           email: user.data().email,
+          isInterviewer: user.data().role === 'interviewer',
         });
       })
       .catch(() => {
@@ -138,3 +139,4 @@ module.exports = router;
 // TODO
 // - encapsulate rendering most used pages with data
 // - simplify firestore data access with utility methods
+// - Return 404 when no such candidate exists instead of unfilled candidate page.

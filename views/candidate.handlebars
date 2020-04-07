@@ -145,17 +145,33 @@
 <br />
 
 <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-  <div class="px-4 py-5 border-b border-gray-200 sm:px-6 overflow-hidden">
-    <h3 class="text-lg leading-6 font-medium text-gray-900">
-      Scorecard
-    </h3>
-    <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
-      {{#if candidate.scorecard}}
-      Results breakdown.
-      {{else}}
-      Available when assignment is completed.
-      {{/if}}
-    </p>
+  <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
+    <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
+      <div class="ml-4 mt-2">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Scorecard
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
+          {{#if candidate.scorecard}}
+            Results breakdown.
+          {{else}}
+            Available when assignment is completed.
+          {{/if}}
+        </p>
+      </div>
+      {{#unless candidate.scorecard}}
+        {{#if isInterviewer}}
+          <div class="ml-4 mt-2 flex-shrink-0">
+          <span class="inline-flex rounded-md shadow-sm">
+            <button type="button" onclick="window.location.href = '/new-scorecard/{{candidate.email}}';"
+                    class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:shadow-outline-indigo focus:border-indigo-700 active:bg-indigo-700">
+              Create scorecard
+            </button>
+          </span>
+          </div>
+        {{/if}}
+      {{/unless}}
+    </div>
   </div>
   <div class="bg-white shadow overflow-hidden sm:rounded-md">
     <ul>
