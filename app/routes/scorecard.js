@@ -20,6 +20,15 @@ router.get('/scorecard/:candidateEmail', async (req, res) => {
         // If candidate got a scorecard pass that instead
         const scorecard = candidate.scorecard ? candidate.scorecard : organization.data().scorecard;
 
+        scorecard.map(function(req) {
+          if (req.result === 'passed') {
+            req.result = true;
+          } else {
+            req.result = false;
+          }
+          return req;
+        });
+
         res.render('scorecard', {
           title: "New Scorecard",
           organizationId: organizationRef.id,
