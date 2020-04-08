@@ -2,7 +2,7 @@ const router = require('express').Router();
 const firestore = require('firebase-admin').firestore();
 const login = require('../actions/auth');
 
-router.get('/new-scorecard/:candidateEmail', async (req, res) => {
+router.get('/scorecard/:candidateEmail', async (req, res) => {
   login(req)
     .then(async (decodedClaims) => {
       const userRef = firestore.collection("users").doc(decodedClaims.user_id);
@@ -13,9 +13,23 @@ router.get('/new-scorecard/:candidateEmail', async (req, res) => {
         const organization = await organizationRef.get();
         const companyName = organization.data().name;
         const roleName = organization.data().role;
-        const scorecard = organization.data().scorecard;
 
-        res.render('new-scorecard', {
+        const candidatesQuerySnapshot = await organizationRef.collection('candidates').where("email", "==", req.params.candidateEmail).get();
+        const candidate = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data())[0];
+
+        // If candidate got a scorecard pass that instead
+        const scorecard = candidate.scorecard ? candidate.scorecard : organization.data().scorecard;
+
+        scorecard.map(function(req) {
+          if (req.result === 'passed') {
+            req.result = true;
+          } else {
+            req.result = false;
+          }
+          return req;
+        });
+
+        res.render('scorecard', {
           title: "New Scorecard",
           organizationId: organizationRef.id,
           company: companyName,
@@ -74,3 +88,5 @@ router.post('/createScorecard', async (req, res) => {
 
 // Exports
 module.exports = router;
+
+// TODO fix result conversion from passed/failed to true/false in the handlebars template
