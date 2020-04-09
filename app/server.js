@@ -8,12 +8,7 @@ const bodyParser = require('body-parser');
 const exphbs = require('express-handlebars');
 const hbs = exphbs.create({
   helpers: {
-    isCompleted: (status) => {
-      return status === "Assignment Completed";
-    },
-    isDroppedOut: (status) => {
-      return status === "Dropped out";
-    },
+
     isPassed: (result) => {
       return result === "passed";
     },
@@ -40,8 +35,7 @@ admin.initializeApp({
 });
 
 // Setting up Express
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
+app.set('view engine', 'ejs');
 app.use('/static', express.static('public'));
 app.use(cookieParser());
 app.use(attachCsrfToken('/', 'csrfToken', (Math.random() * 100000000000000000).toString()));
