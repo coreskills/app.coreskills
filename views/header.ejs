@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>{{title}}</title>
+    <title><%= title %></title>
     <base href="/">
     <link rel="stylesheet" href="/static/tailwind.css" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
@@ -14,7 +14,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <div class="min-h-screen bg-white">
-    {{#if role}}
+    <% if (role) {%>
     <nav x-data="{ open: false }" class="bg-white border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -36,7 +36,7 @@
                             <button @click="open = !open"
                                     class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
                                 <img class="h-8 w-8 rounded-full"
-                                     src="{{avatar}}"
+                                     src="<%= avatar %>>"
                                      alt="" />
                             </button>
                         </div>
@@ -77,15 +77,15 @@
                 <div class="flex items-center px-4">
                     <div class="flex-shrink-0">
                         <img class="h-10 w-10 rounded-full"
-                             src="{{avatar}}"
+                             src="<%= avatar %>"
                              alt="" />
                     </div>
                     <div class="ml-3">
                         <div class="text-base font-medium leading-6 text-gray-800">
-                            {{displayName}}
+                            <%= displayName %>
                         </div>
                         <div class="text-sm font-medium leading-5 text-gray-500">
-                            {{email}}
+                            <%= email%>
                         </div>
                     </div>
                 </div>
@@ -102,16 +102,16 @@
             </div>
         </div>
     </nav>
-    {{/if}}
+    <% } %>
 
     <div class="py-10">
-        {{#if role}}
+        <% if (role) {%>
         <header>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="md:flex md:items-center md:justify-between">
                     <div class="flex-1 min-w-0">
                         <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 sm:truncate">
-                            {{role}}
+                            <%= role %>
                         </h2>
                     </div>
                     <div class="mt-4 flex md:mt-0 md:ml-4">
@@ -134,7 +134,7 @@
                 </div>
             </div>
         </header>
-        {{/if}}
+        <% }%>
         <main>
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Replace with your content -->
