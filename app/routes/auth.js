@@ -25,11 +25,11 @@ router.post('/sessionLogin', async (req, res) => {
 });
 
 router.get('/forgot-password', (req, res) => {
-  res.render("forgot-password");
+  res.render("forgot-password", { title: 'Forgot Password' });
 });
 
 router.get('/reset-email-sent', (req, res) => {
-  res.render("reset-email-sent");
+  res.render("reset-email-sent", { title: 'Reset Link Sent'});
 });
 
 router.get('/sessionLogout', (req, res) => {

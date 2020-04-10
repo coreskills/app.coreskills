@@ -4,34 +4,6 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-// Handlebars
-const exphbs = require('express-handlebars');
-const hbs = exphbs.create({
-  helpers: {
-    isCompleted: (status) => {
-      return status === "Assignment Completed";
-    },
-    isDroppedOut: (status) => {
-      return status === "Dropped out";
-    },
-    isPassed: (result) => {
-      return result === "passed";
-    },
-    isGreen: (score) => {
-      return score >= 80;
-    },
-    isYellow: (score) => {
-      return score >= 60 && score < 80;
-    },
-    isOrange: (score) => {
-      return score >= 40 && score < 60;
-    },
-    isRed: (score) => {
-      return score < 40;
-    }
-  }
-});
-
 // Firebase
 const admin = require('firebase-admin');
 admin.initializeApp({
@@ -40,8 +12,7 @@ admin.initializeApp({
 });
 
 // Setting up Express
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
+app.set('view engine', 'ejs');
 app.use('/static', express.static('public'));
 app.use(cookieParser());
 app.use(attachCsrfToken('/', 'csrfToken', (Math.random() * 100000000000000000).toString()));

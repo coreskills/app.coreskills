@@ -88,5 +88,3 @@ router.post('/createScorecard', async (req, res) => {
 
 // Exports
 module.exports = router;
-
-// TODO fix result conversion from passed/failed to true/false in the handlebars template
