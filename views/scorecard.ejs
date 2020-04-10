@@ -1,16 +1,16 @@
 <%- include('header'); -%>
-<div x-data="{'scorecard': [
+<div x-data='{"scorecard": [
         <% scorecard.forEach((row) => { %>
           {
-            'task': '<%= row.task %>',
-            'skills': '<%= row.skills %>',
-            'result': <%= row.result %>,
-            'comments': '<%= row.comments %>',
-            toggle() { this.result = !this.result; }
+            "task": "<%= row.task %>",
+            "skills": "<%= row.skills %>",
+            "result": <%= row.result %>,
+            toggle() { this.result = !this.result; },
+            "comments": "<%= row.comments %>",
           },
         <% }) %>
       ]
-    }">
+    }'>
   <form x-on:submit.prevent>
     <% scorecard.forEach((row, idx) => { %>
       <div class="mt-8 border-t border-gray-200 pt-5">
