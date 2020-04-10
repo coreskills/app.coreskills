@@ -47,15 +47,19 @@ router.get('/candidate/:email', async function (req, res) {
         const candidatesQuerySnapshot = await organizationRef.collection(CANDIDATES_COLLECTION).where("email", "==", req.params.email).get();
         const candidateList = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data());
 
-        res.render('candidate', {
-          title: 'Candidate Information',
-          role: roleName,
-          candidate: candidateList[0],
-          displayName: user.data().displayName,
-          avatar: user.data().avatar,
-          email: user.data().email,
-          isInterviewer: user.data().role === 'interviewer',
-        });
+        if (candidateList.length === 0) {
+          res.status(404).end('Not Found');
+        } else {
+          res.render('candidate', {
+            title: 'Candidate Information',
+            role: roleName,
+            candidate: candidateList[0],
+            displayName: user.data().displayName,
+            avatar: user.data().avatar,
+            email: user.data().email,
+            isInterviewer: user.data().role === 'interviewer',
+          });
+        }
       })
       .catch(() => {
         res.render('login', { title: "Login" });

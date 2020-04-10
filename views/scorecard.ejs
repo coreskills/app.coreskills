@@ -1,18 +1,18 @@
 <%- include('header'); -%>
 <div x-data="{'scorecard': [
-        <% scorecard.foreach((row, idx) => { %>
+        <% scorecard.forEach((row) => { %>
           {
-            'task': '<%= task %>',
-            'skills': '<%= skills %>',
-            'result': <%= result %>,
-            'comments': '<%= comments %>',
+            'task': '<%= row.task %>',
+            'skills': '<%= row.skills %>',
+            'result': <%= row.result %>,
+            'comments': '<%= row.comments %>',
             toggle() { this.result = !this.result; }
           },
         <% }) %>
       ]
     }">
   <form x-on:submit.prevent>
-    <% scorecard.foreach((row, idx) => { %>
+    <% scorecard.forEach((row, idx) => { %>
       <div class="mt-8 border-t border-gray-200 pt-5">
         <div>
           <div>
