@@ -4,29 +4,6 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-// Handlebars
-const exphbs = require('express-handlebars');
-const hbs = exphbs.create({
-  helpers: {
-
-    isPassed: (result) => {
-      return result === "passed";
-    },
-    isGreen: (score) => {
-      return score >= 80;
-    },
-    isYellow: (score) => {
-      return score >= 60 && score < 80;
-    },
-    isOrange: (score) => {
-      return score >= 40 && score < 60;
-    },
-    isRed: (score) => {
-      return score < 40;
-    }
-  }
-});
-
 // Firebase
 const admin = require('firebase-admin');
 admin.initializeApp({
