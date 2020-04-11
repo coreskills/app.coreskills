@@ -93,7 +93,28 @@ router.get("/new-candidate", (req, res) => {
 });
 
 router.get("/edit-candidate-info/:email", (req, res) => {
-  res.render('edit-candidate-info', { title: 'Edit Candidate Information'});
+  login(req)
+    .then(async (decodedClaims) => {
+      // Get logged-in user
+      const userRef = firestore.collection(USERS_COLLECTION).doc(decodedClaims.user_id);
+      const user = await userRef.get();
+
+      // Get user's org
+      const organizationRef = user.data().organization;
+      const organization = await organizationRef.get();
+      const roleName = organization.data().role;
+
+      res.render('edit-candidate-info', {
+        title: 'Edit Candidate Information',
+        role: roleName,
+        displayName: user.data().displayName,
+        avatar: user.data().avatar,
+        email: user.data().email,
+      });
+    })
+    .catch(() => {
+      res.render('login', { title: "Login" });
+    });
 });
 
 // Utils
