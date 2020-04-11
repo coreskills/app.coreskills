@@ -92,6 +92,10 @@ router.get("/new-candidate", (req, res) => {
     });
 });
 
+router.get("/edit-candidate-info/:email", (req, res) => {
+  res.render('edit-candidate-info', { title: 'Edit Candidate Information'});
+});
+
 // Utils
 async function renderDemoProfile(req, res) {
   const organization = firestore.collection(ORGANIZATIONS_COLLECTION).doc('ghxJKxmhi7c5CxpBGVBx');
