@@ -104,18 +104,40 @@ router.get("/edit-candidate-info/:email", (req, res) => {
       const organization = await organizationRef.get();
       const roleName = organization.data().role;
 
+      const candidatesQuerySnapshot = await organizationRef.collection(CANDIDATES_COLLECTION).where("email", "==", req.params.email).get();
+      const candidate = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data())[0];
+
       res.render('edit-candidate-info', {
         title: 'Edit Candidate Information',
         role: roleName,
         displayName: user.data().displayName,
         avatar: user.data().avatar,
         email: user.data().email,
+        candidateEmail: candidate.email,
+        fullName: candidate.fullName,
+        status: candidate.status,
+        repository: candidate.repository,
+        pullRequest: candidate.pullRequest,
+        totalScore: candidate.totalScore,
+
       });
     })
     .catch(() => {
       res.render('login', { title: "Login" });
     });
 });
+
+router.post("/updateCandidateInfo", (req, res) => {
+  login(req)
+    .then(async (decodedClaims) => {
+      const { status, repository, pullRequest, totalScore } = req.body;
+      updateCandidateInfo(email, status, repository, pullRequest, totalScore);
+      res.end(JSON.stringify({ status: 'success' }));
+    })
+    .catch(() => {
+      res.status(401).end('Unauthorized');
+    });
+})
 
 // Utils
 async function renderDemoProfile(req, res) {
@@ -159,6 +181,17 @@ function addCandidate(organizationId, emailAddress, fullName) {
     fullName: fullName,
     expiresOn: '(pending)',
     status: "Sending assignment"
+  });
+}
+
+async function updateCandidateInfo(email, status, repository, pullRequest, totalScore) {
+  const candidatesQuerySnapshot = await organization.collection(CANDIDATES_COLLECTION).where("email", "==", req.params.email).get();
+  const candidate = candidatesQuerySnapshot.docs[0];
+  candidate.ref.update({
+    status: status,
+    repository: repository,
+    pullRequest: pullRequest,
+    totalScore: totalScore,
   });
 }
 
