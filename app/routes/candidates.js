@@ -130,7 +130,7 @@ router.get("/edit-candidate-info/:email", (req, res) => {
 router.post("/updateCandidateInfo", (req, res) => {
   login(req)
     .then(async (decodedClaims) => {
-      const { status, repository, pullRequest, totalScore } = req.body;
+      const { email, status, repository, pullRequest, totalScore } = req.body;
       updateCandidateInfo(email, status, repository, pullRequest, totalScore);
       res.end(JSON.stringify({ status: 'success' }));
     })
@@ -185,7 +185,8 @@ function addCandidate(organizationId, emailAddress, fullName) {
 }
 
 async function updateCandidateInfo(email, status, repository, pullRequest, totalScore) {
-  const candidatesQuerySnapshot = await organization.collection(CANDIDATES_COLLECTION).where("email", "==", req.params.email).get();
+  // FIXME organizationId not defined - org should be path of url
+  const candidatesQuerySnapshot = await firestore.collection(ORGANIZATIONS_COLLECTION).doc(organizationId).collection(CANDIDATES_COLLECTION).where("email", "==", email).get();
   const candidate = candidatesQuerySnapshot.docs[0];
   candidate.ref.update({
     status: status,
