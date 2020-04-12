@@ -1,15 +1,15 @@
 <%- include('header'); -%>
 <div x-data='
       {
-        "fullName": "<%=fullName%>,
-        "email": "<%=candidateEmail%>,
         "candidate": {
-          "status": "<%=status%>,
-          "repository": "<%=repository%>,
-          "pullRequest": "<%=pullRequest%>,
-          "totalScore": "<%=totalScore%>,
-        }
-        selectStatus(newStatus) { this.candidate.status = newStatus; },
+          "fullName": "<%=fullName%>",
+          "email": "<%=candidateEmail%>",
+          "status": "<%=status%>",
+          "repository": "<%=repository%>",
+          "pullRequest": "<%=pullRequest%>",
+          "totalScore": <%=totalScore%>,
+        },
+        selectStatus(newStatus) { this.candidate.status = newStatus; }
       }
     '>
   <form>
