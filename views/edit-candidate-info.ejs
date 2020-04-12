@@ -3,11 +3,13 @@
       {
         "fullName": "<%=fullName%>,
         "email": "<%=candidateEmail%>,
-        "status": "<%=status%>,
-        "repository": "<%=repository%>,
-        "pullRequest": "<%=pullRequest%>,
-        "totalScore": "<%=totalScore%>,
-        selectStatus(newStatus) { this.status = newStatus; },
+        "candidate": {
+          "status": "<%=status%>,
+          "repository": "<%=repository%>,
+          "pullRequest": "<%=pullRequest%>,
+          "totalScore": "<%=totalScore%>,
+        }
+        selectStatus(newStatus) { this.candidate.status = newStatus; },
       }
     '>
   <form>
@@ -30,7 +32,7 @@
                     </label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
                         <div class="max-w-lg rounded-md shadow-sm">
-                            <input x-model="fullName" id="full_name" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" readonly/>
+                            <input x-model="candidate.fullName" id="full_name" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" readonly/>
                         </div>
                     </div>
                 </div>
@@ -41,7 +43,7 @@
                     </label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
                         <div class="max-w-lg rounded-md shadow-sm">
-                            <input x-model="email" id="email" type="email" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" readonly/>
+                            <input x-model="candidate.email" id="email" type="email" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" readonly/>
                         </div>
                     </div>
                 </div>
@@ -52,7 +54,7 @@
                     </label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
                         <div class="max-w-xs rounded-md shadow-sm">
-                            <select x-model="status" id="status" class="block form-select w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">
+                            <select x-model="candidate.status" id="status" class="block form-select w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">
                                 <option>Sending Assignment</option>
                                 <option>Assignment Sent</option>
                                 <option>Code Review</option>
@@ -73,7 +75,7 @@
                       <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
                         https://gitlab.com/
                       </span>
-                            <input x-model="repository" id="repository" class="flex-1 form-input block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                            <input x-model="candidate.repository" id="repository" class="flex-1 form-input block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                         </div>
                     </div>
                 </div>
@@ -87,7 +89,7 @@
                       <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
                         https://gitlab.com/
                       </span>
-                            <input x-model="pullRequest" id="pull_request" class="flex-1 form-input block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                            <input x-model="candidate.pullRequest" id="pull_request" class="flex-1 form-input block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                         </div>
                     </div>
                 </div>
@@ -98,7 +100,7 @@
                     </label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
                         <div class="max-w-xs rounded-md shadow-sm">
-                            <input x-model="totalScore" id="total_score" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                            <input x-model="candidate.totalScore" id="total_score" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                         </div>
                     </div>
                 </div>
@@ -122,10 +124,10 @@
                       url: 'updateCandidateInfo',
                       data: {
                         'email': '<%=candidateEmail%>',
-                        'status': '<%=status%>',
-                        'repository': '<%=repository%>',
-                        'pullRequest': '<%=pullRequest%>',
-                        'totalScore': <%=totalScore%>,
+                        'status': candidate.status,
+                        'repository': candidate.repository,
+                        'pullRequest': candidate.pullRequest,
+                        'totalScore': candidate.totalScore,
                       },
                       contentType: 'application/x-www-form-urlencoded'
                     });
