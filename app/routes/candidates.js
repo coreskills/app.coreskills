@@ -18,6 +18,8 @@ const ORGANIZATIONS_COLLECTION = 'organizations';
 const CANDIDATES_COLLECTION = 'candidates';
 const USERS_COLLECTION = 'users';
 
+const GITLAB_BASE_URL = 'https://gitlab.com/';
+
 // Commands
 router.post('/sendAssignment', async (req, res) => {
   login(req)
@@ -92,6 +94,61 @@ router.get("/new-candidate", (req, res) => {
     });
 });
 
+router.get("/edit-candidate-info/:email", (req, res) => {
+  login(req)
+    .then(async (decodedClaims) => {
+      // Get logged-in user
+      const userRef = firestore.collection(USERS_COLLECTION).doc(decodedClaims.user_id);
+      const user = await userRef.get();
+
+      // Get user's org
+      const organizationRef = user.data().organization;
+      const organization = await organizationRef.get();
+      const roleName = organization.data().role;
+
+      const candidatesQuerySnapshot = await organizationRef.collection(CANDIDATES_COLLECTION).where("email", "==", req.params.email).get();
+      const candidate = candidatesQuerySnapshot.docs.map(snapshot => snapshot.data())[0];
+
+      res.render('edit-candidate-info', {
+        title: 'Edit Candidate Information',
+        role: roleName,
+        displayName: user.data().displayName,
+        avatar: user.data().avatar,
+        email: user.data().email,
+        candidateEmail: candidate.email,
+        fullName: candidate.fullName,
+        expiresOn: candidate.expiresOn,
+        status: candidate.status,
+        repository: candidate.repository.replace(GITLAB_BASE_URL, ''),
+        pullRequest: candidate.pullRequest.replace(GITLAB_BASE_URL, ''),
+        totalScore: candidate.totalScore,
+
+      });
+    })
+    .catch(() => {
+      res.render('login', { title: "Login" });
+    });
+});
+
+router.post("/updateCandidateInfo", (req, res) => {
+  login(req)
+    .then(async (decodedClaims) => {
+      // Get logged-in user
+      const userRef = firestore.collection(USERS_COLLECTION).doc(decodedClaims.user_id);
+      const user = await userRef.get();
+
+      // Get user's org
+      const orgDocRef = user.data().organization;
+
+      const { email, expiresOn, status, repository, pullRequest, totalScore } = req.body;
+      updateCandidateInfo(orgDocRef.id, email, expiresOn, status, repository, pullRequest, totalScore);
+      res.end(JSON.stringify({ status: 'success' }));
+    })
+    .catch(() => {
+      res.status(401).end('Unauthorized');
+    });
+})
+
 // Utils
 async function renderDemoProfile(req, res) {
   const organization = firestore.collection(ORGANIZATIONS_COLLECTION).doc('ghxJKxmhi7c5CxpBGVBx');
@@ -134,6 +191,18 @@ function addCandidate(organizationId, emailAddress, fullName) {
     fullName: fullName,
     expiresOn: '(pending)',
     status: "Sending assignment"
+  });
+}
+
+async function updateCandidateInfo(orgId, email, expiresOn, status, repository, pullRequest, totalScore) {
+  const candidatesQuerySnapshot = await firestore.collection(ORGANIZATIONS_COLLECTION).doc(orgId).collection(CANDIDATES_COLLECTION).where("email", "==", email).get();
+  const candidate = candidatesQuerySnapshot.docs[0];
+  candidate.ref.update({
+    expiresOn: expiresOn,
+    status: status,
+    repository: GITLAB_BASE_URL + repository,
+    pullRequest: GITLAB_BASE_URL + pullRequest,
+    totalScore: totalScore,
   });
 }
 

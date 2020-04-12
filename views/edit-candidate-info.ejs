@@ -1,0 +1,159 @@
+<%- include('header'); -%>
+<div x-data='
+      {
+        "candidate": {
+          "fullName": "<%=fullName%>",
+          "email": "<%=candidateEmail%>",
+          "expiresOn": "<%=expiresOn%>",
+          "status": "<%=status%>",
+          "repository": "<%=repository%>",
+          "pullRequest": "<%=pullRequest%>",
+          "totalScore": "<%=totalScore%>",
+        },
+        selectStatus(newStatus) { this.candidate.status = newStatus; }
+      }
+    '>
+  <form>
+    <div>
+
+        <div class="mt-8 border-t border-gray-200 pt-8 sm:mt-5 sm:pt-10">
+            <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    Candidate Information
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
+                    Here you can update candidate's information.
+                </p>
+            </div>
+            <div class="mt-6 sm:mt-5">
+
+                <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="full_name" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                        Full name
+                    </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <div class="max-w-lg rounded-md shadow-sm">
+                            <input x-model="candidate.fullName" id="full_name" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" readonly/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="email" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                        Email address
+                    </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <div class="max-w-lg rounded-md shadow-sm">
+                            <input x-model="candidate.email" id="email" type="email" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" readonly/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="expiresOn" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                        Expires on
+                    </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <div class="max-w-lg rounded-md shadow-sm">
+                            <input x-model="candidate.expiresOn" id="expiresOn" type="date" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="status" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                        Status
+                    </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <div class="max-w-xs rounded-md shadow-sm">
+                            <select x-model="candidate.status" id="status" class="block form-select w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">
+                                <option>Sending Assignment</option>
+                                <option>Assignment Sent</option>
+                                <option>Code Review</option>
+                                <option>Compiling Scorecard</option>
+                                <option>Assignment Completed</option>
+                                <option>Withdrawn</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                  <label for="repository" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                    Repository
+                  </label>
+                  <div class="mt-1 sm:mt-0 sm:col-span-2">
+                    <div class="max-w-lg flex rounded-md shadow-sm">
+                      <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                        https://gitlab.com/
+                      </span>
+                            <input x-model="candidate.repository" id="repository" class="flex-1 form-input block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="pull_request" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                        Pull Request
+                    </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <div class="max-w-lg flex rounded-md shadow-sm">
+                      <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                        https://gitlab.com/
+                      </span>
+                            <input x-model="candidate.pullRequest" id="pull_request" class="flex-1 form-input block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="total_score" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                        Total Score
+                    </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <div class="max-w-xs rounded-md shadow-sm">
+                            <input x-model="candidate.totalScore" id="total_score" type="number" min="0" max="100" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="mt-8 border-t border-gray-200 pt-5">
+        <div class="flex justify-end">
+      <span class="inline-flex rounded-md shadow-sm">
+        <button type="button" class="py-2 px-4 border border-gray-300 rounded-md text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800 transition duration-150 ease-in-out">
+          Cancel
+        </button>
+      </span>
+            <span class="ml-3 inline-flex rounded-md shadow-sm">
+        <button type="submit"
+                x-on:click="
+                  {
+                    $.ajax({
+                      type: 'POST',
+                      url: 'updateCandidateInfo',
+                      data: {
+                        'email': '<%=candidateEmail%>',
+                        'expiresOn': candidate.expiresOn,
+                        'status': candidate.status,
+                        'repository': candidate.repository,
+                        'pullRequest': candidate.pullRequest,
+                        'totalScore': candidate.totalScore,
+                      },
+                      contentType: 'application/x-www-form-urlencoded'
+                    });
+                    window.location.assign('/candidate/<%= candidateEmail%>');
+                    event.preventDefault();
+                  }
+                "
+                class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+          Save
+        </button>
+      </span>
+        </div>
+    </div>
+  </form>
+</div>
+<%- include('footer'); -%>
