@@ -119,8 +119,8 @@ router.get("/edit-candidate-info/:email", (req, res) => {
         fullName: candidate.fullName,
         expiresOn: candidate.expiresOn,
         status: candidate.status,
-        repository: candidate.repository.replace(GITLAB_BASE_URL, ''),
-        pullRequest: candidate.pullRequest.replace(GITLAB_BASE_URL, ''),
+        repository: candidate.repository === undefined ? null : candidate.repository.replace(GITLAB_BASE_URL, ''),
+        pullRequest: candidate.pullRequest === undefined ? null : candidate.pullRequest.replace(GITLAB_BASE_URL, ''),
         totalScore: candidate.totalScore,
 
       });
