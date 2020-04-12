@@ -4,6 +4,7 @@
         "candidate": {
           "fullName": "<%=fullName%>",
           "email": "<%=candidateEmail%>",
+          "expiresOn": "<%=expiresOn%>",
           "status": "<%=status%>",
           "repository": "<%=repository%>",
           "pullRequest": "<%=pullRequest%>",
@@ -44,6 +45,17 @@
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
                         <div class="max-w-lg rounded-md shadow-sm">
                             <input x-model="candidate.email" id="email" type="email" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" readonly/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                    <label for="expiresOn" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                        Expires on
+                    </label>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <div class="max-w-lg rounded-md shadow-sm">
+                            <input x-model="candidate.expiresOn" id="expiresOn" type="date" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"/>
                         </div>
                     </div>
                 </div>
@@ -100,7 +112,7 @@
                     </label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
                         <div class="max-w-xs rounded-md shadow-sm">
-                            <input x-model="candidate.totalScore" id="total_score" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                            <input x-model="candidate.totalScore" id="total_score" type="number" min="0" max="100" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                         </div>
                     </div>
                 </div>
@@ -124,6 +136,7 @@
                       url: 'updateCandidateInfo',
                       data: {
                         'email': '<%=candidateEmail%>',
+                        'expiresOn': candidate.expiresOn,
                         'status': candidate.status,
                         'repository': candidate.repository,
                         'pullRequest': candidate.pullRequest,

@@ -18,6 +18,8 @@ const ORGANIZATIONS_COLLECTION = 'organizations';
 const CANDIDATES_COLLECTION = 'candidates';
 const USERS_COLLECTION = 'users';
 
+const GITLAB_BASE_URL = 'https://gitlab.com/';
+
 // Commands
 router.post('/sendAssignment', async (req, res) => {
   login(req)
@@ -115,9 +117,10 @@ router.get("/edit-candidate-info/:email", (req, res) => {
         email: user.data().email,
         candidateEmail: candidate.email,
         fullName: candidate.fullName,
+        expiresOn: candidate.expiresOn,
         status: candidate.status,
-        repository: candidate.repository,
-        pullRequest: candidate.pullRequest,
+        repository: candidate.repository.replace(GITLAB_BASE_URL, ''),
+        pullRequest: candidate.pullRequest.replace(GITLAB_BASE_URL, ''),
         totalScore: candidate.totalScore,
 
       });
@@ -130,8 +133,15 @@ router.get("/edit-candidate-info/:email", (req, res) => {
 router.post("/updateCandidateInfo", (req, res) => {
   login(req)
     .then(async (decodedClaims) => {
-      const { email, status, repository, pullRequest, totalScore } = req.body;
-      updateCandidateInfo(email, status, repository, pullRequest, totalScore);
+      // Get logged-in user
+      const userRef = firestore.collection(USERS_COLLECTION).doc(decodedClaims.user_id);
+      const user = await userRef.get();
+
+      // Get user's org
+      const orgDocRef = user.data().organization;
+
+      const { email, expiresOn, status, repository, pullRequest, totalScore } = req.body;
+      updateCandidateInfo(orgDocRef.id, email, expiresOn, status, repository, pullRequest, totalScore);
       res.end(JSON.stringify({ status: 'success' }));
     })
     .catch(() => {
@@ -184,14 +194,14 @@ function addCandidate(organizationId, emailAddress, fullName) {
   });
 }
 
-async function updateCandidateInfo(email, status, repository, pullRequest, totalScore) {
-  // FIXME organizationId not defined - org should be path of url
-  const candidatesQuerySnapshot = await firestore.collection(ORGANIZATIONS_COLLECTION).doc(organizationId).collection(CANDIDATES_COLLECTION).where("email", "==", email).get();
+async function updateCandidateInfo(orgId, email, expiresOn, status, repository, pullRequest, totalScore) {
+  const candidatesQuerySnapshot = await firestore.collection(ORGANIZATIONS_COLLECTION).doc(orgId).collection(CANDIDATES_COLLECTION).where("email", "==", email).get();
   const candidate = candidatesQuerySnapshot.docs[0];
   candidate.ref.update({
+    expiresOn: expiresOn,
     status: status,
-    repository: repository,
-    pullRequest: pullRequest,
+    repository: GITLAB_BASE_URL + repository,
+    pullRequest: GITLAB_BASE_URL + pullRequest,
     totalScore: totalScore,
   });
 }
