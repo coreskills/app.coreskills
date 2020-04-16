@@ -163,6 +163,7 @@ async function renderDemoProfile(req, res) {
     displayName: "Frances J. Ruel",
     avatar: "https://secure.gravatar.com/avatar/ae3d5387e16c55b28ea5d3e6bcf8c70b?s=80&d=identicon",
     email: "FrancesJRuel@dayrep.com",
+    isInterviewer: false,
   });
 }
 
